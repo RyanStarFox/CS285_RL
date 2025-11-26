@@ -64,12 +64,20 @@ def build_mlp(
 
 def init_gpu(use_gpu=True, gpu_id=0):
     global device
-    if torch.cuda.is_available() and use_gpu:
-        device = torch.device("cuda:" + str(gpu_id))
-        print("Using GPU id {}".format(gpu_id))
+    if use_gpu:
+        # 优先级：CUDA > MPS > CPU
+        if torch.cuda.is_available():
+            device = torch.device("cuda:" + str(gpu_id))
+            print("Using CUDA GPU id {}".format(gpu_id))
+        elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            device = torch.device("mps")
+            print("Using MPS (Apple Silicon GPU).")
+        else:
+            device = torch.device("cpu")
+            print("Using CPU (no GPU available).")
     else:
         device = torch.device("cpu")
-        print("Using CPU.")
+        print("Using CPU (GPU disabled by user).")
 
 
 def set_device(gpu_id):
