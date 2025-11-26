@@ -125,7 +125,7 @@ class PGAgent(nn.Module):
             # TODO: run the critic and use it as a baseline
             obs_tensor = ptu.from_numpy(obs)  # numpy → torch.Tensor
             values_tensor = self.critic.forward(obs_tensor)
-            values = self.critic.forward(obs)
+            values = ptu.to_numpy(values_tensor.squeeze())
             assert values.shape == q_values.shape
 
             if self.gae_lambda is None:

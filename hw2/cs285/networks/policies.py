@@ -68,13 +68,15 @@ class MLPPolicy(nn.Module):
             dist = torch.distributions.Categorical(logits=logits)
             action = dist.sample()
             action = ptu.to_numpy(action)
+            action = int(action.item())
         else:
             mean = self.mean_net(obs)
             dist = torch.distributions.Normal(mean, self.logstd.exp())
             action = dist.sample()
             action = ptu.to_numpy(action)
+            action = action.flatten()
 
-        return action.flatten()
+        return action
 
     def forward(self, obs: torch.FloatTensor):
         """
